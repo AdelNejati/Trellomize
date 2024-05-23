@@ -1,4 +1,5 @@
 from rich import console
+from rich.table import Table
 import os
 import json
 import re
@@ -9,26 +10,30 @@ from enum import Enum
 console = console.Console()
 
 
-class Model:
+class model:
     def __init__(self):
         self.id = uuid.uuid4()
 
 
-class Account(Model):
+class Account(model):
     def __init__(self):
-        self.id = Model()
+        self.id = model()
         self.data = []
         self.user_info = dict()
         self.user_detail_list = []
         self.logged_in = False
         self.active_user_account = True
         self.user_info["ID"] = str(self.id)
+        self.regular_member_projects = []
+        self.leader_member_projects = []
 
     def register(self, user_name, password, email):
         self.user_info["gmail"] = email
         self.user_info["Username"] = user_name
         self.user_info["Password"] = password
-        self.user_info["Is_active"] = "No" if not self.active_user_account else "Yes"
+        self.user_info["Is_active"] = False if not self.active_user_account else True
+        self.user_info["Regular_member"] = self.regular_member_projects
+        self.user_info["Leader_member"] = self.leader_member_projects
         self.data = json.load(open("users.json", "r"))
 
         def is_valid_gmail():
@@ -58,7 +63,7 @@ class Account(Model):
             self.data.append(self.user_info)
             with open("users.json", "w") as f:
                 json.dump(self.data, f, indent=4)
-            console.print("Account created successfully\n", style="bold green")
+            console.print("\nAccount created successfully", style="bold green")
             self.active_user_account = True
 
     def login(self, user_name, password):
@@ -70,7 +75,7 @@ class Account(Model):
                                   " You are not allowed to access the account!\n", style="bold red")
                     return False
                 if password == item.get("Password"):
-                    console.print(f"Welcome {user_name}\n",
+                    console.print(f"\nWelcome {user_name}",
                                   style="bold green")
                     self.logged_in = True
                     return True
@@ -86,7 +91,7 @@ class Account(Model):
     #         return next((item.get("ID") for item in info_users if username == item.get("Username")), None)
 
 
-class CreateTask(Model):
+class CreateTask(model):
     class Priority(Enum):
         LOW = 1
         MEDIUM = 2
@@ -101,7 +106,7 @@ class CreateTask(Model):
         ARCHIVED = 5
 
     def __init__(self):
-        self.task_unique_identifier = Model()
+        self.task_unique_identifier = model()
         self.task_properties = []
         self.title = ""
         self.description = ""
@@ -149,9 +154,9 @@ class CreateTask(Model):
         self.assignees.append(assignee)
 
 
-class CreateProject(Model):
+class CreateProject(model):
     def __init__(self, title):
-        self.id = Model()
+        self.id = model()
         self.data = []
         self.project_details = dict()
         self.title = title
@@ -161,7 +166,6 @@ class CreateProject(Model):
     def save_information(self, leader_id):
         self.project_details["Leader_ID"] = leader_id
         self.project_details["Title"] = self.title
-        # self.project_details["leader_id"] = self.leader_id
         self.project_details["Members"] = self.members
         self.data = json.load(open("projects.json", "r"))
         self.data.append(self.project_details)
@@ -196,6 +200,11 @@ def delete_project(username):
                     json.dump(info_projects, f, indent=4)
 
                 console.print("The project was deleted successfully.", style="green")
+                for i in range(len(info_users)):
+                    if info_users[i].get("Username") == username:
+                        info_users[i].get("Leader_member").remove(title)
+                        with open("users.json", "w") as f:
+                            json.dump(info_users, f, indent=4)
     else:
         console.print("This project is not valid!\nOr you are not the leader of this project", style="bold red")
 
@@ -224,7 +233,12 @@ def add_user_project(username):
                     with open("projects.json", "w") as f:
                         json.dump(info_projects, f, indent=4)
 
-                    console.print("User added successfully.", style="green")
+                    for i in range(len(info_users)):
+                        if info_users[i].get("Username") == add_user_name:
+                            info_users[i].get("Regular_member").append(title)
+                            with open("users.json", "w") as f:
+                                json.dump(info_users, f, indent=4)
+                    console.print(f"{add_user_name} added to {title} project", style="green")
         else:
             console.print("Entered username is not valid!", style="bold red")
     else:
@@ -255,18 +269,46 @@ def delete_user_project(username):
                     with open("projects.json", "w") as f:
                         json.dump(info_projects, f, indent=4)
 
-                    console.print("User added successfully.", style="green")
+                    for i in range(len(info_users)):
+                        if info_users[i].get("Username") == delete_user_name:
+                            info_users[i].get("Regular_member").remove(title)
+                            with open("users.json", "w") as f:
+                                json.dump(info_users, f, indent=4)
+                    console.print(f"{delete_user_name} deleted from {title} project", style="green")
                 else:
                     console.print("Entered username is not valid!", style="bold red")
     else:
         console.print("This project is not valid!\nOr you are not the leader of this project", style="bold red")
 
 
+def create_main_menu():
+    table = Table(title="Main menu")
+    table.add_column("Option", style="blue", justify="center")
+    table.add_column("Description")
+    table.add_row("[yellow]1[/yellow]", "[magenta]Create Account[/magenta]")
+    table.add_row("[yellow]2[/yellow]", "[magenta]Login[/magenta]")
+    table.add_row("[yellow]3[/yellow]", "[red]Exit[/red]")
+    console.print(table)
+
+
+def account_page():
+    table = Table(title="Account Page")
+    table.add_column("Option", style="blue", justify="center")
+    table.add_column("Description")
+    table.add_row("[yellow]1[/yellow]", "[magenta]Create New Project[/magenta]")
+    table.add_row("[yellow]2[/yellow]", "[magenta]Add user in project[/magenta]")
+    table.add_row("[yellow]3[/yellow]", "[magenta]delete user in project[/magenta]")
+    table.add_row("[yellow]4[/yellow]", "[magenta]delete project[/magenta]")
+    table.add_row("[yellow]5[/yellow]", "[magenta]List of projects in which you are the leader[/magenta]")
+    table.add_row("[yellow]6[/yellow]", "[magenta]List of projects in which you are a regular member[/magenta]")
+    table.add_row("[yellow]0[/yellow]", "[red]Logout[/red]")
+    console.print(table)
+
+
 def menu():
     while True:
-        print("1- Create account\n"
-              "2- Login to to your account\n"
-              "3- Exit")
+        create_main_menu()
+
         console.print("Enter your select...", style="bold yellow")
         choice = input()
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -288,13 +330,7 @@ def menu():
             password = input()
             user.login(username, password)
             while user.logged_in:
-                print("1- Create new project\n"
-                      "2- Add user in project\n"
-                      "3- delete user in project\n"
-                      "4- delete project\n"
-                      "5- List of projects in which you are the leader\n"
-                      "6- List of projects in which you are a regular member\n"
-                      "0- Back to main menu")
+                account_page()
                 console.print("Enter your select...", style="bold yellow")
                 choice = input()
                 os.system('cls' if os.name == 'nt' else 'clear')
@@ -302,6 +338,13 @@ def menu():
                 if choice == '1':
                     console.print("Please choose a title for your project", style="bold yellow")
                     title_project = input()
+                    info_users = json.load(open("users.json", "r"))
+                    for i in range(len(info_users)):
+                        if info_users[i].get("Username") == username:
+                            info_users[i].get("Leader_member").append(title_project)
+                            with open("users.json", "w") as f:
+                                json.dump(info_users, f, indent=4)
+
                     console.print("The construction of the project was completed successfully", style="bold green")
                     project = CreateProject(title_project)
 
@@ -317,6 +360,30 @@ def menu():
 
                 elif choice == '4':
                     delete_project(username)
+
+                elif choice == '5':
+                    info_users = json.load(open("users.json", "r"))
+                    for i in range(len(info_users)):
+                        if info_users[i].get("Username") == username:
+                            console.print("List of projects in which you are the leader: ", style="blue")
+                            if info_users[i].get("Leader_member"):
+                                console.print(info_users[i].get("Leader_member"))
+                                break
+                            else:
+                                console.print("Nothing found!", style="black")
+                                break
+
+                elif choice == '6':
+                    info_users = json.load(open("users.json", "r"))
+                    for i in range(len(info_users)):
+                        if info_users[i].get("Username") == username:
+                            console.print("List of projects in which you are a regular member: ", style="blue")
+                            if info_users[i].get("Regular_member"):
+                                console.print(info_users[i].get("Regular_member"))
+                                break
+                            else:
+                                console.print("Nothing found!", style="black")
+                                break
 
                 elif choice == '0':
                     break
