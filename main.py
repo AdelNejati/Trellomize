@@ -8,6 +8,7 @@ import datetime
 from enum import Enum
 import bcrypt
 
+
 console = console.Console()
 
 
@@ -30,6 +31,14 @@ class Account(model):
     def __init__(self):
         self.id = model()
         self.user_name = ""
+
+    def __init__(self):
+        self.id = uuid.uuid4()
+
+
+class Account(model):
+    def __init__(self):
+        self.id = model()
         self.data = []
         self.user_info = dict()
         self.user_detail_list = []
@@ -42,8 +51,10 @@ class Account(model):
     def register(self, user_name, password, email):
         self.user_info["gmail"] = email
         self.user_info["Username"] = user_name
+
         self.user_info["Hash_password_str"] = hash_password(password).decode('utf8')
         # self.Hash_password = hash_password(password)
+        self.user_info["Password"] = password
         self.user_info["Is_active"] = False if not self.active_user_account else True
         self.user_info["Regular_member"] = self.regular_member_projects
         self.user_info["Leader_member"] = self.leader_member_projects
@@ -87,8 +98,10 @@ class Account(model):
                     console.print("The user account has been closed by the system administrator."
                                   " You are not allowed to access the account!\n", style="bold red")
                     return False
+
                 # if hash_password(password) == item.get("Hash_password"):
                 if verify_password(password, item.get("Hash_password_str").encode('utf8')):
+                if password == item.get("Password"):
                     console.print(f"\nWelcome {user_name}",
                                   style="bold green")
                     self.logged_in = True
@@ -177,6 +190,7 @@ class CreateProject(model):
         self.members = []
         self.project_details["Project_ID"] = str(self.id)
         self.tasks = []
+
 
     def save_information(self, leader_id):
         self.project_details["Leader_ID"] = leader_id
@@ -400,7 +414,7 @@ def task_delete(username):
         console.print("This project is not valid!\nOr you are not the leader of this project!", style="bold red")
         passing()
 
-
+        
 def menu():
     while True:
         create_main_menu()
