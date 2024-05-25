@@ -201,6 +201,7 @@ class CreateTask(Model):
         self.comment_writer = ""
 
     def save_info(self, title_project):
+        pass
         # self.exist_file = False
         # if not self.exist_file:
         #     with open(f"{title_project}_tasks.json", "w") as f:
@@ -452,7 +453,7 @@ def delete_project(username):
 
 def add_user_project(username):
     if is_your_project(username):
-    is_exist_project = False
+        is_exist_project = False
     console.print("Enter title of your project", style="yellow")
     title = input()
     info_projects = json.load(open ("projects.json", "r"))
