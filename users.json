@@ -1,1 +1,14 @@
-[]
+[
+    {
+        "ID": "<__main__.Model object at 0x00000187EC33E2D0>",
+        "Email": "Adel@gmail.com",
+        "Username": "Adel",
+        "Hash_password_str": "$2b$12$XwS9E6F01H2sw6DEJq.bhe5eUSN8aXwBqwegFjR37eDY7F3CyNpyW",
+        "Is_active": true,
+        "Regular_member": [],
+        "Leader_member": [
+            "p1",
+            ""
+        ]
+    }
+]

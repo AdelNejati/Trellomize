@@ -1,0 +1,20 @@
+[
+    {
+        "ID": "<main.Model object at 0x0000021A93EFC890>",
+        "Email": "adel@gmail.com",
+        "Username": "Adel",
+        "Hash_password_str": "$2b$12$aRx12yzTxbfiUcp/4XJyRusH8tNuM8aVb9A/QANcOkUmWiXM39ZfO",
+        "Is_active": true,
+        "Regular_member": [],
+        "Leader_member": []
+    },
+    {
+        "ID": "<main.Model object at 0x000001C3C3504A40>",
+        "Email": "ali@yahoo.com",
+        "Username": "Ali",
+        "Hash_password_str": "$2b$12$kHlzTG1S/.CKWpIupR33aOCH8p2i6Mi./ByUOLl5leL75yno4xUf.",
+        "Is_active": true,
+        "Regular_member": [],
+        "Leader_member": []
+    }
+]
