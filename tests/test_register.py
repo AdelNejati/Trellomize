@@ -35,8 +35,3 @@ def test_register2():
 
 
 
-# if __name__ == "__main__":
-#     test_register1()
-#     test_register2()
-#     print("py ./manager.py purge-data")
-

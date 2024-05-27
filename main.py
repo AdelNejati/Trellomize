@@ -49,7 +49,7 @@ class Account(Model):
         self.projects = []
 
     def register(self, user_name, password, email):
-        self.user_info["gmail"] = email
+        self.user_info["Email"] = email
         self.user_info["Username"] = user_name
         self.user_info["Hash_password_str"] = hash_password(password=password).decode('utf8')
         self.user_info["Is_active"] = False if not self.active_user_account else True
